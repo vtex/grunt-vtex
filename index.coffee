@@ -7,7 +7,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
   options.relativePath or= pkg.paths[0].slice(1)
   
   # options.replaceGlob: which files to replace on copy:deploy task
-  options.replaceGlob or= "build/**/index.html"
+  options.replaceGlob or= "build/**/{index.html,app.js,app.min.js}"
   
   # options.replaceMap: which keys to replace with which values on copy:deploy task
   unless options.replaceMap
@@ -15,7 +15,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
     options.replaceMap[pkg.paths[0]] = "//io.vtex.com.br/#{pkg.name}/#{pkg.version}"
 
   # options.copyIgnore: array of globs to ignore on copy:main
-  options.copyIgnore or= ['!views/**', '!partials/**', '!**/*.coffee', '!**/*.less']
+  options.copyIgnore or= ['!views/**', '!partials/**', '!templates/**', '!**/*.coffee', '!**/*.less']
   
   # options.dryrun: if true, nothing will actually be deployed
   options.dryrun or= if grunt.option('dry-run') then '--dryrun' else ''
@@ -80,18 +80,29 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
       options:
         processContentExclude: ['**/*.{png,gif,jpg,ico,psd}']
         # Replace contents on files before deploy following rules in options.replace.map.
-        process: (contents, srcpath) ->
+        process: (src, srcpath) ->
           replaceFiles = glob.sync options.replaceGlob
           for file in replaceFiles when file.indexOf(srcpath) >= 0
             console.log "Replacing file...", file
             for k, v of options.replaceMap
               console.log "Replacing key", k, "with value", v
-              contents = contents.replace(new RegExp(k, 'g'), v)
-          return contents
+              src = src.replace(new RegExp(k, 'g'), v)
+          return src
 
   shell:
     deploy:
       command: "AWS_CONFIG_FILE=/.aws-config-front aws s3 sync --size-only #{options.dryrun} #{pkg.deploy} s3://vtex-io/#{pkg.name}/"
+
+  concat:
+    templates:
+      options:
+        process: (src, srcpath) ->
+          fp = srcpath.split("/")
+          fileName = fp[fp.length-1].replace(".html", "")
+          body = src.replace(/(\r\n|\n|\r)/g, "").replace(/\"/g, "\\\"")
+          return "document.write(\"<script type='text/html' id='#{fileName}'>#{body}</script>\");"
+      src: 'src/templates/**/*.html'
+      dest: "build/#{options.relativePath}/script/ko-templates.js"
 
   coffee:
     main:
@@ -131,7 +142,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
     main:
       cwd: "build/#{options.relativePath}/"
       src: 'views/**/*.html',
-      dest: "build/#{options.relativePath}/script/templates.js"
+      dest: "build/#{options.relativePath}/script/ng-templates.js"
       options:
         module: 'app'
         htmlmin:  collapseWhitespace: true, collapseBooleanAttributes: true
@@ -166,9 +177,12 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
       tasks: ['less']
     css:
       files: ['build/**/*.css']
-    templates:
+    ngtemplates:
       files: ['src/views/**/*.html', 'src/partials/**/*.html']
       tasks: ['nginclude', 'ngtemplates']
+    kotemplates:
+      files: ['src/templates/**/*.html']
+      tasks: ['concat:templates']
     main:
       files: ['src/i18n/**/*.json', 'src/index.html', 'src/lib/**/*.*']
       tasks: ['copy']
