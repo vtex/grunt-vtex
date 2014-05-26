@@ -178,11 +178,16 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
     css:
       files: ['build/**/*.css']
     ngtemplates:
-      files: ['src/views/**/*.html', 'src/partials/**/*.html']
+      files: ['src/views/**/*.html', 
+              'src/partials/**/*.html']
       tasks: ['nginclude', 'ngtemplates']
     kotemplates:
       files: ['src/templates/**/*.html']
       tasks: ['concat:templates']
     main:
-      files: ['src/i18n/**/*.json', 'src/index.html', 'src/lib/**/*.*']
-      tasks: ['copy']
+      files: ['src/i18n/**/*.json', 
+              'src/script/**/*.js', 
+              'src/img/**/*',
+              'src/lib/**/*',
+              'src/index.html']
+      tasks: ['copy:main']
