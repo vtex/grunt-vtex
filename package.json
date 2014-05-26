@@ -1,6 +1,6 @@
 {
   "name": "grunt-vtex",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "readmeFilename": "README.md",
   "description": "A Grunt convention-over-configuration parasite",
   "main": "index.coffee",
