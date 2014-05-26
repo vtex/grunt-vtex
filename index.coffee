@@ -93,8 +93,10 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
           return src
 
   shell:
-    deploy:
+    sync:
       command: "AWS_CONFIG_FILE=/.aws-config-front aws s3 sync --size-only #{options.dryrun} #{pkg.deploy} s3://vtex-io/#{pkg.name}/"
+    cp:
+      command: "AWS_CONFIG_FILE=/.aws-config-front aws s3 cp --recursive #{options.dryrun} #{pkg.deploy} s3://vtex-io/#{pkg.name}/"
 
   concat:
     templates:
