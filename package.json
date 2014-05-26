@@ -1,0 +1,29 @@
+{
+  "name": "grunt-vtex",
+  "version": "0.0.0",
+  "readmeFilename": "README.md",
+  "description": "A Grunt convention-over-configuration parasite",
+  "main": "index.coffee",
+  "dependencies": {
+    "connect": "2.13.1",
+    "connect-http-please": "^0.1.1",
+    "connect-livereload": "git://github.com/gadr/connect-livereload#7f4a0b7",
+    "connect-mock": "~0.1.0",
+    "connect-tryfiles": "^0.2.1",
+    "glob": "^3.2.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vtex/grunt-vtex.git"
+  },
+  "keywords": [
+    "grunt",
+    "coffee",
+    "less",
+    "livereload"
+  ],
+  "contributors": [
+    "Guilherme Rodrigues <gadr90@gmail.com>"
+  ],
+  "license": "MIT"
+}
