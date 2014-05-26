@@ -30,6 +30,9 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
   # options.port: which port the connect proxy should listen to
   options.port or= 80
 
+  # options.replaceHost: function to replace the host upon proxying
+  options.replaceHost or= (h) -> h.replace("vtexlocal", "vtexcommercebeta")
+  
   # options.proxyTarget: what target to proxy to
   options.proxyTarget or= "http://portal.vtexcommercebeta.com.br:80"
   
@@ -37,7 +40,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
   unless options.middlewares
     options.middlewares = [
       require('connect-livereload')({disableCompression: true})
-      require('connect-http-please')(replaceHost: ((h) -> h.replace("vtexlocal", environment)), {verbose: options.verbose})
+      require('connect-http-please')(replaceHost: options.replaceHost, {verbose: options.verbose})
       require('connect-tryfiles')('**', options.proxyTarget, {cwd: 'build/', verbose: options.verbose})
       require('connect').static('./build/')
       (err, req, res, next) ->

@@ -30,6 +30,7 @@ In your Gruntfile:
 **options.open** whether to open automatically a page on running  
 **options.verbose** whether to log all available information  
 **options.port** which port the connect proxy should listen to  
+**options.replaceHost** function to replace the host upon proxying  
 **options.proxyTarget** what target to proxy to  
 **options.middlewares** array of middlewares to use in connect  
   
