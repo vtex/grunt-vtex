@@ -22,16 +22,16 @@ In your Gruntfile:
 
 ## Options
 
-**options.relativePath** where to put files under build folder
-**options.replaceGlob** which files to replace on copy:deploy task
-**options.replaceMap** which keys to replace with which values on copy:deploy task
-**options.copyIgnore** array of globs to ignore on copy:main
-**options.dryrun** if true, nothing will actually be deployed
-**options.open** whether to open automatically a page on running
-**options.verbose** whether to log all available information
-**options.port** which port the connect proxy should listen to
-**options.proxyTarget** what target to proxy to
-**options.middlewares** array of middlewares to use in connect
+**options.relativePath** where to put files under build folder  
+**options.replaceGlob** which files to replace on copy:deploy task  
+**options.replaceMap** which keys to replace with which values on copy:deploy task  
+**options.copyIgnore** array of globs to ignore on copy:main  
+**options.dryrun** if true, nothing will actually be deployed  
+**options.open** whether to open automatically a page on running  
+**options.verbose** whether to log all available information  
+**options.port** which port the connect proxy should listen to  
+**options.proxyTarget** what target to proxy to  
+**options.middlewares** array of middlewares to use in connect  
   
 ------
 
