@@ -15,7 +15,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
     options.replaceMap[pkg.paths[0]] = "//io.vtex.com.br/#{pkg.name}/#{pkg.version}"
 
   # options.copyIgnore: array of globs to ignore on copy:main
-  options.copyIgnore or= ['!views/**', '!partials/**', '!templates/**', '!**/*.coffee', '!**/*.less']
+  options.copyIgnore or= ['!views/**', '!partials/**', '!templates/**', '!**/*.coffee', '!**/*.less', '!**/*.pot', '!**/*.po']
   
   # options.dryrun: if true, nothing will actually be deployed
   options.dryrun or= if grunt.option('dry-run') then '--dryrun' else ''
@@ -152,6 +152,17 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         module: 'app'
         htmlmin:  collapseWhitespace: true, collapseBooleanAttributes: true
 
+  nggettext_extract:
+    pot:
+      files: 'src/i18n/template.pot': ['src/**/*.html']
+
+  nggettext_compile:
+    all:
+      options:
+        module: 'app'
+      files:
+        'build/<%= relativePath %>/script/ng-translations.js': ['src/i18n/*.po']
+
   useminPrepare:
     html: "build/#{options.relativePath}/index.html"
     options:
@@ -189,8 +200,11 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
     kotemplates:
       files: ['src/templates/**/*.html']
       tasks: ['concat:templates']
+    ngtranslations:
+      files: ['src/i18n/**/*.po']
+      tasks: ['nggettext_compile']
     main:
-      files: ['src/i18n/**/*.json', 
+      files: ['src/i18n/**/*.json',
               'src/script/**/*.js', 
               'src/img/**/*',
               'src/lib/**/*',
