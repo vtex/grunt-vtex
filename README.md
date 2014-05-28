@@ -1,6 +1,17 @@
 # Grunt VTEX
 
-A Grunt convention-over-configuration parasite.
+A Grunt convention-over-configuration meta-project.
+
+The file `index.coffee` exposes only one function: `generateConfig`.  
+It receives your `grunt`, `pkg` (your package.json parsed object) and `options`.  
+It returns an object with configurations for all tasks used across projects in VTEX.  
+
+Your project should only define very specific customizations outside of this config.  
+This enforces uniformity and eases advancing configurations across every project simultaneously.
+
+## Important
+
+If you are heavily altering a defined task or adding a new one, please **bump the minor version**.
 
 ## Usage
 
@@ -14,6 +25,9 @@ In your Gruntfile:
       options = {...}
       config = GruntVTEX.generateConfig grunt, pkg, options
 
+      ## customize by altering config
+      config.copy.main = {...}
+      
       tasks = {...}
     
       grunt.initConfig config
