@@ -47,7 +47,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         errString = err.code?.red ? err.toString().red
         grunt.log.warn(errString, req.url.yellow)
     ]
-    options.middlewares = middlewares.unshift(require('connect-mock')({verbose: options.verbose})) if grunt.option 'mock'
+    options.middlewares.unshift(require('connect-mock')({verbose: options.verbose})) if grunt.option 'mock'
 
   relativePath: options.relativePath
     
