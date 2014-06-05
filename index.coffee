@@ -22,7 +22,14 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
 
   # options.open: whether to open automatically a page on running
   if options.open is undefined 
-    options.open = "http://basedevmkp.vtexlocal.com.br/#{options.relativePath}/"
+    options.open =
+      target: "http://basedevmkp.vtexlocal.com.br/#{options.relativePath}/"
+      appName: "google-chrome --incognito"
+  else if typeof options.open is "string"
+    target = options.open
+    options.open =
+      target: target
+      appName: "google-chrome --incognito"
 
   # options.verbose: whether to log all available information
   options.verbose or= grunt.option('verbose')
