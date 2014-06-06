@@ -43,18 +43,32 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
   # options.proxyTarget: what target to proxy to
   options.proxyTarget or= "http://portal.vtexcommercebeta.com.br:80"
   
+  # options.followHttps: whether to follow HTTPS redirects transparently and return HTTP
+  options.followHttps or= false
+  
+  # options.livereload: whether to use livereload, or in which port to use it
+  if options.livereload is undefined
+    options.livereload = true
+  
   # options.middlewares: array of middlewares to use in connect
   unless options.middlewares
     options.middlewares = [
-      require('connect-livereload')({disableCompression: true})
-      require('connect-http-please')(replaceHost: options.replaceHost, {verbose: options.verbose})
       require('connect-tryfiles')('**', options.proxyTarget, {cwd: 'build/', verbose: options.verbose})
       require('connect').static('./build/')
       (err, req, res, next) ->
         errString = err.code?.red ? err.toString().red
         grunt.log.warn(errString, req.url.yellow)
     ]
-    options.middlewares.unshift(require('connect-mock')({verbose: options.verbose})) if grunt.option 'mock'
+    
+    if options.livereload
+      lrPort = if typeof options.livereload is 'number' then options.livereload else null
+      options.middlewares.unshift(require('connect-livereload')({disableCompression: true, port: lrPort}))
+
+    if options.followHttps
+      options.middlewares.unshift(require('connect-http-please')(replaceHost: options.replaceHost, {verbose: options.verbose}))
+    
+    if grunt.option 'mock'
+      options.middlewares.unshift(require('connect-mock')({verbose: options.verbose})) 
 
   relativePath: options.relativePath
     
@@ -189,7 +203,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
 
   watch:
     options:
-      livereload: true
+      livereload: options.livereload
     coffee:
       files: ['src/script/**/*.coffee']
       tasks: ['coffee']

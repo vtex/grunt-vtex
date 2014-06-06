@@ -46,6 +46,8 @@ In your Gruntfile:
 **options.port** which port the connect proxy should listen to  
 **options.replaceHost** function to replace the host upon proxying  
 **options.proxyTarget** what target to proxy to  
+**options.followHttps** whether to follow HTTPS redirects transparently and return HTTP  
+**options.livereload** whether to use livereload, or in which port to use it 
 **options.middlewares** array of middlewares to use in connect  
   
 ------
