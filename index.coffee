@@ -102,7 +102,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         dest: "#{pkg.deploy}/#{pkg.version}"
       ]
       options:
-        processContentExclude: ['**/*.{png,gif,jpg,ico,psd}']
+        processContentExclude: ['**/*.{png,gif,jpg,ico,psd,ttf,otf,woff,svg}']
         # Replace contents on files before deploy following rules in options.replace.map.
         process: (src, srcpath) ->
           replaceFiles = glob.sync options.replaceGlob
