@@ -200,6 +200,12 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         open: options.open
         port: process.env.PORT || options.port
         middleware: options.middlewares
+    https:
+      options:
+        hostname: "*"
+        port: 443
+        protocol: 'https'
+        middleware: options.middlewares
 
   watch:
     options:
