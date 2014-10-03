@@ -4,24 +4,24 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
   throw new Error("package.deploy and package.name are required") unless pkg and pkg.deploy and pkg.name
 
   # options.relativePath: where to put files under build folder
-  options.relativePath or= pkg.paths[0].slice(1)
-  
+  options.relativePath or= pkg.name
+
   # options.replaceGlob: which files to replace on copy:deploy task
   options.replaceGlob or= "build/**/{index.html,app.js,app.min.js}"
-  
+
   # options.replaceMap: which keys to replace with which values on copy:deploy task
   unless options.replaceMap
     options.replaceMap = {}
-    options.replaceMap[pkg.paths[0]] = "//io.vtex.com.br/#{pkg.name}/#{pkg.version}"
+    options.replaceMap['/' + options.relativePath] = "//io.vtex.com.br/#{pkg.name}/#{pkg.version}"
 
   # options.copyIgnore: array of globs to ignore on copy:main
   options.copyIgnore or= ['!views/**', '!partials/**', '!templates/**', '!**/*.coffee', '!**/*.less', '!**/*.pot', '!**/*.po']
-  
+
   # options.dryrun: if true, nothing will actually be deployed
   options.dryrun or= if grunt.option('dry-run') then '--dryrun' else ''
 
   # options.open: whether to open automatically a page on running
-  if options.open is undefined 
+  if options.open is undefined
     options.open =
       target: "http://basedevmkp.vtexlocal.com.br/#{options.relativePath}/"
       appName: "google-chrome --incognito"
@@ -33,23 +33,23 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
 
   # options.verbose: whether to log all available information
   options.verbose or= grunt.option('verbose')
-  
+
   # options.port: which port the connect proxy should listen to
   options.port or= 80
 
   # options.replaceHost: function to replace the host upon proxying
   options.replaceHost or= (h) -> h.replace("vtexlocal", "vtexcommercebeta")
-  
+
   # options.proxyTarget: what target to proxy to
   options.proxyTarget or= "http://portal.vtexcommercebeta.com.br:80"
-  
+
   # options.followHttps: whether to follow HTTPS redirects transparently and return HTTP
   options.followHttps or= false
-  
+
   # options.livereload: whether to use livereload, or in which port to use it
   if options.livereload is undefined
     options.livereload = true
-  
+
   # options.middlewares: array of middlewares to use in connect
   unless options.middlewares
     options.middlewares = [
@@ -59,19 +59,19 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         errString = err.code?.red ? err.toString().red
         grunt.log.warn(errString, req.url.yellow)
     ]
-    
+
     if options.livereload
       lrPort = if typeof options.livereload is 'number' then options.livereload else null
       options.middlewares.unshift(require('connect-livereload')({disableCompression: true, port: lrPort}))
 
     if options.followHttps
       options.middlewares.unshift(require('connect-http-please')(replaceHost: options.replaceHost, {verbose: options.verbose}))
-    
+
     if grunt.option 'mock'
-      options.middlewares.unshift(require('connect-mock')({verbose: options.verbose})) 
+      options.middlewares.unshift(require('connect-mock')({verbose: options.verbose}))
 
   relativePath: options.relativePath
-    
+
   clean:
     main: ['build', 'deploy']
 
@@ -81,23 +81,23 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         expand: true
         cwd: 'src/'
         src: ['**'].concat(options.copyIgnore)
-        dest: "build/#{options.relativePath}/"
+        dest: "build/<%= relativePath %>/"
       ]
     pkg:
       files: [
         src: ['package.json']
-        dest: "build/#{options.relativePath}/package.json"
+        dest: "build/<%= relativePath %>/package.json"
       ]
     janus_index:
       files: [
         # Serve index.html where janus expects it
         src: ['src/index.html']
-        dest: "build/#{options.relativePath}/#{options.relativePath}/index.html"
+        dest: "build/<%= relativePath %>/<%= relativePath %>/index.html"
       ]
     deploy:
       files: [
         expand: true
-        cwd: "build/#{options.relativePath}/"
+        cwd: "build/<%= relativePath %>/"
         src: ['**']
         dest: "#{pkg.deploy}/#{pkg.version}"
       ]
@@ -133,7 +133,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
           body = src.replace(/(\r\n|\n|\r)/g, "").replace(/\"/g, "\\\"")
           return "document.write(\"<script type='text/html' id='#{fileName}'>#{body}</script>\");"
       src: 'src/templates/**/*.html'
-      dest: "build/#{options.relativePath}/script/ko-templates.js"
+      dest: "build/<%= relativePath %>/script/ko-templates.js"
 
   coffee:
     main:
@@ -141,7 +141,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         expand: true
         cwd: 'src/script'
         src: ['**/*.coffee']
-        dest: "build/#{options.relativePath}/script/"
+        dest: "build/<%= relativePath %>/script/"
         rename: (path, filename) ->
           path + filename.replace("coffee", "js")
       ]
@@ -152,7 +152,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         expand: true
         cwd: 'src/style'
         src: ['style.less', 'print.less']
-        dest: "build/#{options.relativePath}/style/"
+        dest: "build/<%= relativePath %>/style/"
         ext: '.css'
       ]
 
@@ -167,13 +167,13 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
       expand: true
       cwd: 'src/views/'
       src: ['**/*.html']
-      dest: "build/#{options.relativePath}/views/"
+      dest: "build/<%= relativePath %>/views/"
 
   ngtemplates:
     main:
-      cwd: "build/#{options.relativePath}/"
+      cwd: "build/<%= relativePath %>/"
       src: 'views/**/*.html',
-      dest: "build/#{options.relativePath}/script/ng-templates.js"
+      dest: "build/<%= relativePath %>/script/ng-templates.js"
       options:
         module: 'app'
         htmlmin:  collapseWhitespace: true, collapseBooleanAttributes: true
@@ -190,13 +190,13 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         'build/<%= relativePath %>/script/ng-translations.js': ['src/i18n/*.po']
 
   useminPrepare:
-    html: "build/#{options.relativePath}/index.html"
+    html: "build/<%= relativePath %>/index.html"
     options:
       dest: 'build/'
       root: 'build/'
 
   usemin:
-    html: ["build/#{options.relativePath}/index.html", "build/#{options.relativePath}/#{options.relativePath}/index.html"]
+    html: ["build/<%= relativePath %>/index.html", "build/<%= relativePath %>/<%= relativePath %>/index.html"]
 
   connect:
     http:
@@ -226,7 +226,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
     css:
       files: ['build/**/*.css']
     ngtemplates:
-      files: ['src/views/**/*.html', 
+      files: ['src/views/**/*.html',
               'src/partials/**/*.html']
       tasks: ['nginclude', 'ngtemplates']
     kotemplates:
@@ -237,7 +237,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
       tasks: ['nggettext_compile']
     main:
       files: ['src/i18n/**/*.json',
-              'src/script/**/*.js', 
+              'src/script/**/*.js',
               'src/img/**/*',
               'src/lib/**/*',
               'src/index.html']
