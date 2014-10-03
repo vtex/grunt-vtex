@@ -1,4 +1,7 @@
+require 'color'
 glob = require 'glob'
+log = -> console.log "grunt-vtex >>>".yellow, arguments...
+
 exports.generateConfig = (grunt, pkg, options = {}) ->
   throw new Error("Grunt is required") unless grunt
   throw new Error("package.deploy and package.name are required") unless pkg and pkg.deploy and pkg.name
@@ -71,7 +74,7 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
       options.middlewares.unshift(require('connect-mock')({verbose: options.verbose}))
 
   if grunt.option 'stable'
-    console.log "grunt-vtex >>> Pointing to stable APIs"
+    log "Pointing to stable APIs"
     addStableHeader = (req, res, next) -> req.headers['X-VTEX-Router-Backend-EnvironmentType'] = 'stable'; next()
     options.middlewares.unshift addStableHeader
 
@@ -112,9 +115,9 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         process: (src, srcpath) ->
           replaceFiles = glob.sync options.replaceGlob
           for file in replaceFiles when file.indexOf(srcpath) >= 0
-            console.log "Replacing file...", file
+            log "Replacing file...", file
             for k, v of options.replaceMap
-              console.log "Replacing key", k, "with value", v
+              log "Replacing key", k, "with value", v
               src = src.replace(new RegExp(k, 'g'), v)
           return src
 
