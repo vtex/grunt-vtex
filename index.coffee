@@ -17,6 +17,12 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
     options.replaceMap = {}
     options.replaceMap['/' + options.relativePath] = "//io.vtex.com.br/#{pkg.name}/#{pkg.version}"
 
+  # options.devReplaceMap: which keys to replace with which values on copy:link task
+  unless options.devReplaceMap
+    options.devReplaceMap = {}
+
+  options.devReplaceRegex or= /\{\{ \'(.*)\' \| vtex_io: \'(.*)\', (\d) \}\}/g
+
   # options.copyIgnore: array of globs to ignore on copy:main
   options.copyIgnore or= ['!views/**', '!partials/**', '!templates/**', '!**/*.coffee', '!**/*.less', '!**/*.pot', '!**/*.po']
 
@@ -78,6 +84,32 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
     addStableHeader = (req, res, next) -> req.headers['X-VTEX-Router-Backend-EnvironmentType'] = 'stable'; next()
     options.middlewares.unshift addStableHeader
 
+  symlink = {}
+  if (linkedProjectsOption = grunt.option('link')) and linkedProjectsOption.length > 0
+    if (not options.linkRegex?) or (not options.linkRegexFunction?)
+      throw new Error("linkRegex and linkRegexFunction are required properties when using --link options")
+
+    for project in linkedProjectsOption.split(',')
+      log "Linking", project, "to build/#{project}"
+      symlink[project] = { src: "../#{project}/build/#{project}", dest: "build/#{project}" }
+
+  features = {}
+  if features = grunt.option('ft') and features.length > 0
+    features = features.split(',')
+    for feature in features
+      features[feature] = true
+      log 'Feature toggle:', feature
+
+  grunt.registerTask 'getTags', ->
+    return true if grunt.config('tags')?
+    done = @async()
+    request = require 'request'
+    registryURL = 'http://vtex-versioned-us.s3.amazonaws.com/registry/1/tags.json'
+    request registryURL, (err, res, body) ->
+      return done(err) if err
+      grunt.config('tags', JSON.parse(body))
+      done()
+
   relativePath: options.relativePath
 
   clean:
@@ -119,6 +151,38 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
             for k, v of options.replaceMap
               log "Replacing key", k, "with value", v
               src = src.replace(new RegExp(k, 'g'), v)
+          return src
+
+    link:
+      files:
+        'build/<%= relativePath %>/index.html': ['build/<%= relativePath %>/index.html']
+      options:
+        process: (src, srcpath) ->
+          log "Replacing file...", srcpath
+          src = src.replace(options.linkRegex, (args...) ->
+            linked = options.linkRegexFunction(args...)
+            if symlink[linked.app]
+              log "link".blue, linked.app, "-> local"
+              return "/#{linked.app}/#{linked.path}"
+            else
+              env = 'beta'
+              tags = grunt.config('tags')
+              version = tags[linked.app][env][linked.major]
+              log "link".blue, linked.app, "->", version
+              return "//io.vtex.com.br/#{linked.app}/#{version}/#{linked.path}")
+          return src
+
+    dev:
+      files:
+        'build/<%= relativePath %>/index.html': ['build/<%= relativePath %>/index.html']
+      options:
+        process: (src, srcpath) ->
+          log "Replacing file...", srcpath
+          for k, v of options.devReplaceMap
+            replaceValue = if typeof v is 'function' then v(features, grunt.config('tags')) else v
+            log "replace".red, k.replace(/\n/g, '\\n').replace(/\rn/g, '\\rn'), (if typeof replaceValue is 'string' then "-> #{replaceValue}" else '-> function return')
+            src = src.replace(new RegExp(k), replaceValue)
+
           return src
 
   shell:
@@ -220,9 +284,13 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
         protocol: 'https'
         middleware: options.middlewares
 
+  symlink: symlink
+
   watch:
     options:
       livereload: options.livereload
+    link:
+      files: ['!build/<%= relativePath %>/*', 'build/**/*']
     coffee:
       files: ['src/script/**/*.coffee']
       tasks: ['coffee']
@@ -249,4 +317,4 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
               'src/img/**/*',
               'src/lib/**/*',
               'src/index.html']
-      tasks: ['copy:main']
+      tasks: ['copy:main', 'registry', 'copy:link']
