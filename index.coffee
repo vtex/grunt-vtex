@@ -70,6 +70,11 @@ exports.generateConfig = (grunt, pkg, options = {}) ->
     if grunt.option 'mock'
       options.middlewares.unshift(require('connect-mock')({verbose: options.verbose}))
 
+  if grunt.option 'stable'
+    console.log "grunt-vtex >>> Pointing to stable APIs"
+    addStableHeader = (req, res, next) -> req.headers['X-VTEX-Router-Backend-EnvironmentType'] = 'stable'; next()
+    options.middlewares.unshift addStableHeader
+
   relativePath: options.relativePath
 
   clean:
