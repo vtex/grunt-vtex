@@ -11,7 +11,8 @@
     "connect-livereload": "git://github.com/gadr/connect-livereload#7f4a0b7",
     "connect-mock": "~0.1.0",
     "connect-tryfiles": "^0.2.1",
-    "glob": "^3.2.9"
+    "glob": "^3.2.9",
+		"request": "^2.40.0"
   },
   "repository": {
     "type": "git",
