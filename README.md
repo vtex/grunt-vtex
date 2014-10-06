@@ -54,13 +54,13 @@ In your Gruntfile:
 
 ## Grunt command line options
 
-`--stable`: proxies to stable API's instead of beta.
-`--link`: sibling project directories to link in order to develop locally.
-`--ft`: features that should be toggled.
+- `--stable`: proxies to stable API's instead of beta.
+- `--link`: sibling project directories to link in order to develop locally.
+- `--ft`: features that should be toggled.
 
-## Registered tags
+## Registered tasks
 
-**getTags**: this task fetches the current `tags.json` file, which tells us which apps are currently published with which versions. 
+- **getTags**: this task fetches the current `tags.json` file, which tells us which apps are currently published with which versions. 
 
 Example excerpt of a `tags.json` file:
 
