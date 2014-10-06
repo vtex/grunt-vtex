@@ -200,6 +200,7 @@ module.exports = (grunt, pkg, options) ->
                 'src/index.html']
         tasks: ['copy:main', 'registry', 'copy:link']
 
+  # grunt option `--link`: sibling project directories to link in order to develop locally.
   if (linkedProjectsOption = grunt.option('link')) and linkedProjectsOption?.length > 0
     symlink = {}
     for project in linkedProjectsOption.split(',')
@@ -208,6 +209,7 @@ module.exports = (grunt, pkg, options) ->
 
     config['symlink'] = symlink
 
+  # grunt option `--ft`: features that should be toggled.
   if (featuresOption = grunt.option('ft')) and featuresOption?.length > 0
     features = {}
     featuresArray = featuresOption.split(',')

@@ -76,6 +76,7 @@ module.exports = (grunt, pkg, options) ->
     if grunt.option 'mock'
       options.middlewares.unshift(require('connect-mock')({verbose: options.verbose}))
 
+  # grunt option `--stable`: proxies to stable API's instead of beta.
   if grunt.option 'stable'
     log "Pointing to stable APIs"
     addStableHeader = (req, res, next) -> req.headers['X-VTEX-Router-Backend-EnvironmentType'] = 'stable'; next()
