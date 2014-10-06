@@ -9,3 +9,8 @@ module.exports = (grunt, pkg, options) ->
       return done(err) if err
       grunt.config('tags', JSON.parse(body))
       done()
+
+  grunt.registerTask 'nolr', ->
+    # Turn off LiveReload in development mode
+    grunt.config 'watch.options.livereload', false
+    return true
