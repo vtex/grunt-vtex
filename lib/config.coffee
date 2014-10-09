@@ -198,7 +198,7 @@ module.exports = (grunt, pkg, options) ->
                 'src/img/**/*',
                 'src/lib/**/*',
                 'src/index.html']
-        tasks: ['copy:main', 'registry', 'copy:link']
+        tasks: ['copy:main', 'getTags', 'copy:dev']
 
   # grunt option `--link`: sibling project directories to link in order to develop locally.
   if (linkedProjectsOption = grunt.option('link')) and linkedProjectsOption?.length > 0
