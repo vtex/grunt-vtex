@@ -93,6 +93,7 @@ module.exports = (grunt, pkg, options) ->
       addHeaders = (req, res, next) ->
         for h, v of options.headers
           req.headers[h] = v
+        req.env = req.headers[options.janusEnvHeader]
         next()
 
       options.middlewares.unshift(addHeaders)
