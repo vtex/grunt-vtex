@@ -36,21 +36,23 @@ In your Gruntfile:
 
 ## Options
 
-**options.relativePath** where to put files under build folder  
-**options.replaceGlob** which files to replace on copy:deploy task  
-**options.replaceMap** which keys to replace with which values on copy:deploy task  
-**options.devReplaceGlob** which files to replace on copy:dev task  
-**options.devReplaceMap** which keys to replace with which values on copy:dev task  
-**options.copyIgnore** array of globs to ignore on copy:main  
-**options.dryrun** if true, nothing will actually be deployed  
-**options.open** whether to open automatically a page on running  
-**options.verbose** whether to log all available information  
-**options.port** which port the connect proxy should listen to  
-**options.replaceHost** function to replace the host upon proxying  
-**options.proxyTarget** what target to proxy to  
-**options.followHttps** whether to follow HTTPS redirects transparently and return HTTP  
-**options.livereload** whether to use livereload, or in which port to use it 
-**options.middlewares** array of middlewares to use in connect  
+- **options.relativePath** where to put files under build folder  
+- **options.replaceGlob** which files to replace on copy:deploy task  
+- **options.replaceMap** which keys to replace with which values on copy:deploy task  
+- **options.devReplaceGlob** which files to replace on copy:dev task  
+- **options.devReplaceMap** which keys to replace with which values on copy:dev task  
+- **options.copyIgnore** array of globs to ignore on copy:main  
+- **options.dryrun** if true, nothing will actually be deployed  
+- **options.open** whether to open automatically a page on running  
+- **options.verbose** whether to log all available information  
+- **options.port** which port the connect proxy should listen to  
+- **options.replaceHost** function to replace the host upon proxying  
+- **options.proxyTarget** what target to proxy to  
+- **options.followHttps** whether to follow HTTPS redirects transparently and return HTTP  
+- **options.livereload** whether to use livereload, or in which port to use it
+- **options.middlewares** array of middlewares to use in connect
+- **options.headers** map with headers to be sent with the request
+- **options.janusEnvHeader** header required by Janus with the requested env. Defaults to *X-VTEX-Janus-Router-CurrentApp-EnvironmentType*
 
 ## Grunt command line options
 
