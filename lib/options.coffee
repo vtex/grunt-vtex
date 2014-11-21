@@ -52,9 +52,22 @@ module.exports = (grunt, pkg, options) ->
   # options.followHttps: whether to follow HTTPS redirects transparently and return HTTP
   options.followHttps or= false
 
+  # options.janusEnvHeader: Janus header to set environment
+  options.janusEnvHeader or= 'X-VTEX-Janus-Router-CurrentApp-EnvironmentType'
+
   # options.livereload: whether to use livereload, or in which port to use it
   if options.livereload is undefined
     options.livereload = true
+
+  if options.headers is undefined
+    options.headers = {}
+    options.headers[options.janusEnvHeader] = 'beta'
+
+  # grunt option `--stable`: proxies to stable API's instead of beta.
+  if grunt.option 'stable'
+    log "Pointing to stable APIs"
+    options.headers or= {}
+    options.headers[options.janusEnvHeader] = 'stable'
 
   # options.middlewares: array of middlewares to use in connect
   unless options.middlewares
@@ -76,8 +89,10 @@ module.exports = (grunt, pkg, options) ->
     if grunt.option 'mock'
       options.middlewares.unshift(require('connect-mock')({verbose: options.verbose}))
 
-  # grunt option `--stable`: proxies to stable API's instead of beta.
-  if grunt.option 'stable'
-    log "Pointing to stable APIs"
-    addStableHeader = (req, res, next) -> req.headers['X-VTEX-Router-Backend-EnvironmentType'] = 'stable'; next()
-    options.middlewares.unshift addStableHeader
+    if options.headers
+      addHeaders = (req, res, next) ->
+        for h, v of options.headers
+          req.headers[h] = v
+        next()
+
+      options.middlewares.unshift(addHeaders)
