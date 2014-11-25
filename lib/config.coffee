@@ -87,6 +87,30 @@ module.exports = (grunt, pkg, options) ->
         src: 'src/templates/**/*.html'
         dest: "build/<%= relativePath %>/script/ko-templates.js"
 
+    jshint:
+      options:
+        "node": true,
+        "esnext": true,
+        "bitwise": true,
+        "camelcase": true,
+        "curly": true,
+        "eqeqeq": true,
+        "immed": true,
+        "indent": 2,
+        "latedef": true,
+        "newcap": true,
+        "noarg": true,
+        "quotmark": "single",
+        "regexp": true,
+        "undef": true,
+        "unused": true,
+        "strict": true,
+        "trailing": true,
+        "smarttabs": true,
+        "white": true
+      main:
+        src: ['src/script/**/*.js']
+
     coffee:
       main:
         files: [
@@ -98,6 +122,21 @@ module.exports = (grunt, pkg, options) ->
             path + filename.replace("coffee", "js")
         ]
 
+    coffeelint:
+      options:
+        "camel_case_classes": true,
+        "indentation": 2,
+        "line_endings": "linux",
+        "no_empty_param_list": true,
+        "no_implicit_braces": true,
+        "no_stand_alone_at": true,
+        "no_tabs": true,
+        "no_trailing_semicolons": true,
+        "no_trailing_whitespace": true,
+        "space_operators": true
+      main:
+        src: ['src/script/**/*.coffee']
+
     less:
       main:
         files: [
@@ -108,8 +147,14 @@ module.exports = (grunt, pkg, options) ->
           ext: '.css'
         ]
 
+    # Lint LESS
+    recess:
+      main:
+        src: ['src/style/**/*.less']
+
     uglify:
       options:
+        banner: "/* #{pkg.name} - v#{pkg.version} */"
         mangle: false
 
     nginclude:
@@ -171,15 +216,16 @@ module.exports = (grunt, pkg, options) ->
       options:
         livereload: options.livereload
       link:
-        files: ['!build/<%= relativePath %>/*', 'build/**/*']
+        files: ['!build/<%= relativePath %>/*',
+                'build/**/*']
       coffee:
         files: ['src/script/**/*.coffee']
-        tasks: ['coffee']
+        tasks: ['coffeelint', 'coffee']
       less:
         options:
           livereload: false
         files: ['src/style/**/*.less']
-        tasks: ['less']
+        tasks: ['recess', 'less']
       css:
         files: ['build/**/*.css']
       ngtemplates:
@@ -192,13 +238,15 @@ module.exports = (grunt, pkg, options) ->
       ngtranslations:
         files: ['src/i18n/**/*.po']
         tasks: ['nggettext_compile']
+      gruntfile:
+        files: ['Gruntfile.coffee']
       main:
         files: ['src/i18n/**/*.json',
                 'src/script/**/*.js',
                 'src/img/**/*',
                 'src/lib/**/*',
                 'src/index.html']
-        tasks: ['copy:main', 'getTags', 'copy:dev']
+        tasks: ['jshint', 'copy:main', 'getTags', 'copy:dev']
 
   # grunt option `--link`: sibling project directories to link in order to develop locally.
   if (linkedProjectsOption = grunt.option('link')) and linkedProjectsOption?.length > 0

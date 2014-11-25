@@ -1,4 +1,4 @@
-registerTasks = require './lib/tasks.coffee'
+registerTasks = require './lib/register.coffee'
 parseOptions = require './lib/options.coffee'
 configTemplate = require './lib/config.coffee'
 
