@@ -68,25 +68,16 @@ module.exports = (grunt, pkg, options) ->
     options.headers or= {}
     options.headers[options.janusEnvHeader] = 'stable'
 
-  # options.middlewares: array of middlewares to use in connect
+  # if options.middleware is defined, nothing else to do
   unless options.middlewares
-    options.middlewares = [
-      require('connect-tryfiles')('**', options.proxyTarget, {cwd: 'build/', verbose: options.verbose})
-      require('connect').static('./build/')
-      (err, req, res, next) ->
-        errString = err.code?.red ? err.toString().red
-        grunt.log.warn(errString, req.url.yellow)
-    ]
 
-    if options.livereload
-      lrPort = if typeof options.livereload is 'number' then options.livereload else null
-      options.middlewares.unshift(require('connect-livereload')({disableCompression: true, port: lrPort}))
+    # options.middlewares: array of middlewares to use in connect
+    options.middlewares = []
 
-    if options.followHttps
-      options.middlewares.unshift(require('connect-http-please')(replaceHost: options.replaceHost, {verbose: options.verbose}))
+    # Header middlewares - always go first
 
     if grunt.option 'mock'
-      options.middlewares.unshift(require('connect-mock')({verbose: options.verbose}))
+      options.middlewares.push(require('connect-mock')({verbose: options.verbose}))
 
     if options.headers
       addHeaders = (req, res, next) ->
@@ -95,4 +86,25 @@ module.exports = (grunt, pkg, options) ->
         req.env = req.headers[options.janusEnvHeader]
         next()
 
-      options.middlewares.unshift(addHeaders)
+      options.middlewares.push(addHeaders)
+
+    if options.livereload
+      lrPort = if typeof options.livereload is 'number' then options.livereload else null
+      options.middlewares.push(require('connect-livereload')({disableCompression: true, port: lrPort}))
+
+    if options.followHttps
+      options.middlewares.push(require('connect-http-please')(replaceHost: options.replaceHost, {verbose: options.verbose}))
+
+    # Use additional user defined middlewares
+    if options.additionalMiddlewares
+      options.middlewares = options.middlewares.concat options.additionalMiddlewares
+
+    # Tail middlewares - always go last
+
+    options.middlewares = options.middlewares.concat [
+      require('connect-tryfiles')('**', options.proxyTarget, {cwd: 'build/', verbose: options.verbose})
+      require('connect').static('./build/')
+      (err, req, res, next) ->
+        errString = err.code?.red ? err.toString().red
+        grunt.log.warn(errString, req.url.yellow)
+    ]
