@@ -122,21 +122,6 @@ module.exports = (grunt, pkg, options) ->
             path + filename.replace("coffee", "js")
         ]
 
-    coffeelint:
-      options:
-        "camel_case_classes": true,
-        "indentation": 2,
-        "line_endings": "linux",
-        "no_empty_param_list": true,
-        "no_implicit_braces": true,
-        "no_stand_alone_at": true,
-        "no_tabs": true,
-        "no_trailing_semicolons": true,
-        "no_trailing_whitespace": true,
-        "space_operators": true
-      main:
-        src: ['src/script/**/*.coffee']
-
     less:
       main:
         files: [
@@ -146,11 +131,6 @@ module.exports = (grunt, pkg, options) ->
           dest: "build/<%= relativePath %>/style/"
           ext: '.css'
         ]
-
-    # Lint LESS
-    recess:
-      main:
-        src: ['src/style/**/*.less']
 
     uglify:
       options:
@@ -220,12 +200,12 @@ module.exports = (grunt, pkg, options) ->
                 'build/**/*']
       coffee:
         files: ['src/script/**/*.coffee']
-        tasks: ['coffeelint', 'coffee']
+        tasks: ['coffee']
       less:
         options:
           livereload: false
         files: ['src/style/**/*.less']
-        tasks: ['recess', 'less']
+        tasks: ['less']
       css:
         files: ['build/**/*.css']
       ngtemplates:
