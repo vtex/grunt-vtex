@@ -1,6 +1,6 @@
-registerTasks = require './lib/register.coffee'
+registerTasks = require './lib/tasks.coffee'
 parseOptions = require './lib/options.coffee'
-configTemplate = require './lib/config.coffee'
+configTemplate = require './lib/defaultConfig.coffee'
 
 exports.generateConfig = (grunt, pkg, options = {}) ->
   throw new Error("Grunt is required") unless grunt

@@ -227,7 +227,7 @@ module.exports = (grunt, pkg, options) ->
                 'src/lib/**/*',
                 'src/index.html',
                 'src/index.dust']
-        tasks: ['jshint', 'copy:main', 'getTags', 'copy:dev']
+        tasks: ['copy:main', 'getTags', 'copy:dev']
 
   # grunt option `--link`: sibling project directories to link in order to develop locally.
   if (linkedProjectsOption = grunt.option('link')) and linkedProjectsOption?.length > 0
