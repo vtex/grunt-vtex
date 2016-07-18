@@ -1,4 +1,6 @@
 require 'color'
+getLinkReplace = require('./linkReplace')
+
 log = -> console.log "grunt-vtex >>>".yellow, arguments...
 
 module.exports = (grunt, pkg, options) ->
@@ -18,7 +20,8 @@ module.exports = (grunt, pkg, options) ->
 
   # options.devReplaceMap: which keys to replace with which values on copy:dev task
   unless options.devReplaceMap
-    options.devReplaceMap = {}
+    options.devReplaceMap =
+      "\\{\\{ \\'(.*)\\' \\| vtex_io: \\'(.*)\\', (\\d) \\}\\}": getLinkReplace(grunt, pkg, options)
 
   # options.copyIgnore: array of globs to ignore on copy:main
   options.copyIgnore or= ['!views/**', '!partials/**', '!templates/**', '!**/*.coffee', '!**/*.less', '!**/*.pot', '!**/*.po']
