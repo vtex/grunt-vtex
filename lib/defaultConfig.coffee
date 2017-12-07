@@ -52,18 +52,6 @@ module.exports = (grunt, pkg, options) ->
           src: options.devReplaceGlob
           dest: "build/<%= relativePath %>/"
         ]
-        options:
-          processContentExclude: ['**/*.{png,gif,jpg,ico,psd,ttf,otf,woff,svg}']
-          process: (src, srcpath) ->
-            log "Replacing file...", srcpath
-            features = grunt.config.get("features")
-            symlink = grunt.config.get("symlink")
-            tags = grunt.config.get("tags")
-            for k, v of options.devReplaceMap
-              replaceValue = if typeof v is 'function' then v(features, symlink, tags) else v
-              log "replace".green, k.replace(/\n/g, '\\n').replace(/\rn/g, '\\rn'), (if typeof replaceValue is 'string' then ("-> ".green + replaceValue) else ("-> ".green + "function return"))
-              src = src.replace(new RegExp(k, 'g'), replaceValue)
-            return src
 
     shell:
       sync:

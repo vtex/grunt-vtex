@@ -12,6 +12,8 @@
     "connect-mock": "~0.1.0",
     "connect-tryfiles": "^0.2.1",
     "glob": "^3.2.9",
+    "liquid-node": "^3.0.0",
+    "q": "^1.5.1",
     "request": "^2.40.0"
   },
   "repository": {
