@@ -182,6 +182,8 @@ module.exports = (grunt, pkg, options) ->
           hostname: "*"
           port: 443
           protocol: 'https'
+          key: grunt.file.read('node_modules/grunt-vtex/lib/server.key').toString()
+          cert: grunt.file.read('node_modules/grunt-vtex/lib/server.crt').toString()
           middleware: options.middlewares
 
     symlink:
