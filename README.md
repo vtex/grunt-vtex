@@ -17,22 +17,24 @@ If you are heavily altering a defined task or adding a new one, please **bump th
 
 In your Gruntfile:
 
-    GruntVTEX = require 'grunt-vtex'
+```coffee
+GruntVTEX = require 'grunt-vtex'
 
-    module.exports = (grunt) ->
-      pkg = grunt.file.readJSON 'package.json'
-  
-      options = {...}
-      config = GruntVTEX.generateConfig grunt, pkg, options
+module.exports = (grunt) ->
+  pkg = grunt.file.readJSON 'package.json'
 
-      ## customize by altering config
-      config.copy.main = {...}
-      
-      tasks = {...}
-    
-      grunt.initConfig config
-      grunt.loadNpmTasks name for name of pkg.devDependencies when name[0..5] is 'grunt-'
-      grunt.registerTask taskName, taskArray for taskName, taskArray of tasks
+  options = {...}
+  config = GruntVTEX.generateConfig grunt, pkg, options
+
+  ## customize by altering config
+  config.copy.main = {...}
+
+  tasks = {...}
+
+  grunt.initConfig config
+  grunt.loadNpmTasks name for name of pkg.devDependencies when name[0..5] is 'grunt-'
+  grunt.registerTask taskName, taskArray for taskName, taskArray of tasks
+```
 
 ## Options
 
@@ -66,66 +68,74 @@ In your Gruntfile:
 
 Example excerpt of a `tags.json` file:
 
-    {
-        oms-ui: {
-            stable: {
-                2: "2.9.76"
-            },
-            beta: {
-                2: "2.9.99-beta"
-            }
-        },
-        license-manager-ui: {
-            stable: {
-                2: "2.1.23"
-            },
-            beta: {
-                2: "2.1.23"
-            }
-        },
-        vtex-id-ui: {
-            stable: {
-                2: "2.2.6",
-                3: "3.2.29"
-            },
-            next: { },
-            beta: {
-                2: "2.2.6",
-                3: "3.2.29-beta"
-            },
-            alpha: { }
-        }
+```json
+{
+  "oms-ui": {
+    "stable": {
+      "2": "2.9.76"
+    },
+    "beta": {
+      "2": "2.9.99-beta"
     }
+  },
+  "license-manager-ui": {
+    "stable": {
+      "2": "2.1.23"
+    },
+    "beta": {
+      "2": "2.1.23"
+    }
+  },
+  "vtex-id-ui": {
+    "stable": {
+      "2": "2.2.6",
+      "3": "3.2.29"
+    },
+    "next": {},
+    "beta": {
+      "2": "2.2.6",
+      "3": "3.2.29-beta"
+    },
+    "alpha": {}
+  }
+}
+```
 
 ## Using link
 
 To develop two projects simultaneously, follow these steps:
 
 - Clone the other project into a sibling directory, install and start with the "dev" task.
+  ```bash
+  cd Projects/
+  git clone git@github.com:vtex/front.shipping-data.git
+  cd front.shipping-data
+  npm i
+  grunt dev // some target which doesn't run a server and livereload
+  ```
+- In another terminal tab, start grunt with the `link` option, passing the name 
+  of the component:
+  ```bash
+  cd Projects/vcs.checkout-ui
+  grunt --link front.shipping-data
+  ```
 
-        $ cd Projects/
-        $ git clone git@github.com:vtex/front.shipping-data.git
-        $ cd front.shipping-data
-        $ npm i
-        $ grunt dev // some target which doesn't run a server and livereload
-
-- In another terminal tab, start grunt with the `link` option, passing the name of the component:
-
-        $ cd Projects/vcs.checkout-ui
-        $ grunt --link front.shipping-data
-    
 This will symlink the `build` folder from the sibling into the `build` folder in this project.
 
 You can also separate multiple projects with a comma, e.g.
 
-        $ grunt --link front.shipping-data,front.cart
+```bash
+grunt --link front.shipping-data,front.cart
+```
 
 ## Using feature toggles
 
 You may turn a feature on using the `ft` option:
 
-        $ grunt --ft totem
-  
+```bash
+grunt --ft totem
+```
+
 ## Advanced `devReplaceMap` usage
 
 `devReplaceMap` accepts a string or a function as a value for a key. In case of a function, it will receive three parameters:
@@ -138,25 +148,27 @@ The result of this function is passed on to the `replace` function. Therefore, y
 
 e.g.:
 
-    featureToggleReplace = (features, symlink, tags) ->	(match) ->
-		if features?['totem'] then match else ''
+```coffee
+featureToggleReplace = (features, symlink, tags) ->	(match) ->
+  if features?['totem'] then match else ''
 
-	linkReplace = (features, symlink, tags) -> (match, path, app, major) ->
-		env = if grunt.option('stable') then 'stable' else 'beta'
-		if symlink[app]
-			console.log "link".blue, app, "->".blue, "local"
-			return "/#{app}/#{path}"
-		else
-			version = tags[app][env][major]
-			console.log "link".blue, app, "->".blue, version
-			return "//io.vtex.com.br/#{app}/#{version}/#{path}"
+linkReplace = (features, symlink, tags) -> (match, path, app, major) ->
+  env = if grunt.option('stable') then 'stable' else 'beta'
+  if symlink[app]
+    console.log chalk.blue("link"), app, chalk.blue("->"), "local"
+    return "/#{app}/#{path}"
+  else
+    version = tags[app][env][major]
+    console.log chalk.blue("link"), app, chalk.blue("->"), version
+    return "//io.vtex.com.br/#{app}/#{version}/#{path}"
 
-	devReplaceMap = {}
-	devReplaceMap["{{ 'checkout-custom.css' | legacy_file_url }}"] = '/arquivos/checkout-custom.css'
-	devReplaceMap["{{ 'checkout-custom.css' | file_url }}"] = '/files/checkout-custom.css'
-	devReplaceMap["{% if config.kiosk %}(\n|\rn|.)*\{% endif %}"] = featureToggleReplace
-	devReplaceMap["\\{\\{ \\'(.*)\\' \\| vtex_io: \\'(.*)\\', (\\d) \\}\\}"] = linkReplace
-  
+devReplaceMap = {}
+devReplaceMap["{{ 'checkout-custom.css' | legacy_file_url }}"] = '/arquivos/checkout-custom.css'
+devReplaceMap["{{ 'checkout-custom.css' | file_url }}"] = '/files/checkout-custom.css'
+devReplaceMap["{% if config.kiosk %}(\n|\rn|.)*\{% endif %}"] = featureToggleReplace
+devReplaceMap["\\{\\{ \\'(.*)\\' \\| vtex_io: \\'(.*)\\', (\\d) \\}\\}"] = linkReplace
+```
+
 ------
 
 VTEX - 2014

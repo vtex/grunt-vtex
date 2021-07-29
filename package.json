@@ -3,16 +3,37 @@
   "version": "0.16.1",
   "readmeFilename": "README.md",
   "description": "A Grunt convention-over-configuration parasite",
-  "main": "index.coffee",
+  "main": "lib/index.js",
+  "files": [
+    "lib/"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "build": "babel --delete-dir-on-start --out-dir lib -f .babelrc src/"
+  },
   "dependencies": {
-    "color": "^0.7.1",
-    "connect": "2.13.1",
-    "connect-http-please": "^0.1.1",
-    "connect-livereload": "~0.5.1",
+    "@babel/cli": "^7.14.8",
+    "@babel/core": "^7.14.8",
+    "@babel/preset-env": "^7.14.8",
+    "chalk": "^4.1.1",
+    "connect": "3.7.0",
+    "connect-http-please": "^0.3.0",
+    "connect-livereload": "~0.6.1",
     "connect-mock": "~0.1.0",
     "connect-tryfiles": "^0.2.1",
-    "glob": "^3.2.9",
-    "request": "^2.40.0"
+    "glob": "^7.1.7",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@vtex/prettier-config": "^0.3.6",
+    "@vtex/tsconfig": "^0.5.6",
+    "eslint": "^7.31.0",
+    "eslint-config-vtex": "^14.1.0",
+    "prettier": "^2.3.2",
+    "typescript": "^4.3.5"
   },
   "repository": {
     "type": "git",

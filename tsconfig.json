@@ -1,0 +1,6 @@
+{
+  "extends": "@vtex/tsconfig",
+  "compilerOptions": {
+    "allowJs": true
+  }
+}
